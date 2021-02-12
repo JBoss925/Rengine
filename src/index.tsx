@@ -1,12 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import AppCanvas from './App';
+import AppReact from './App-React';
 import reportWebVitals from './reportWebVitals';
+
+type RenderingEngineOption = 'canvas' | 'react';
+let RENDERING_ENGINE = 'canvas';
+const App = (RENDERING_ENGINE === 'canvas') ? AppCanvas : AppReact;
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App/>
   </React.StrictMode>,
   document.getElementById('root')
 );
