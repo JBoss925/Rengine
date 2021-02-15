@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./App.css";
-import { StartGameLoop } from "./Loop";
-import { init } from './Lifecycle';
+import { StartGameLoop } from "../Loop";
+import { init } from '../../Lifecycle';
 
 let gameStarted: boolean = true;
 
@@ -35,7 +35,7 @@ const GameCanvas: React.FunctionComponent = () => {
         ctx.fillRect(0, 0, es.config.width, es.config.height);
         ctx.stroke();
         es.activeScene?.entities.forEach((e) => {
-          e.render(e);
+          e.render(es)(e);
         });
       }]);
     }

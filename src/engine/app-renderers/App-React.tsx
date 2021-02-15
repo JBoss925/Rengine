@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import { StartGameLoop } from "./Loop";
-import { init } from './Lifecycle';
+import { StartGameLoop } from "../Loop";
+import { init } from '../../Lifecycle';
 
 const rootStyle: React.CSSProperties = {
   width: "100vw",
@@ -16,7 +16,7 @@ export const DrawGame: React.FunctionComponent<{ state: EngineState }> = ({ stat
     return <></>;
   } else {
     const scene = state.activeScene;
-    const entitiesRendered = scene.entities.map((e, ind) => { return { ...e.render(e), key: ind } });
+    const entitiesRendered = scene.entities.map((e, ind) => { return { ...e.render(state)(e), key: ind } });
     return <>{entitiesRendered}</>;
   }
 };

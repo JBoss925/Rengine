@@ -1,3 +1,4 @@
+import { AnimationFactory } from "../components/animation/engine";
 import { Cameras } from "./camera";
 import { Entities } from "./entity";
 import { Games } from "./game";
@@ -11,6 +12,7 @@ const Rengine = {
   Renderer: Renderers,
   Scene: Scenes,
   StyleConversion: StyleConversions,
+  Animation: AnimationFactory,
 };
 
 export default Rengine;
@@ -27,6 +29,9 @@ export class Colors {
   static ColorToString = (c: Color): string => {
     return "rgba(" + c.r + "," + c.g + "," + c.b + "," + c.a + ")";
   };
+  static rgbaToColor = (r: number, g: number, b: number, a: number): Color => {
+    return { r: r, g: g, b: b, a: a };
+  };
 }
 
 export class MathUtil {
@@ -35,10 +40,10 @@ export class MathUtil {
   ): Vector2 => {
     let cos = Math.cos(rad),
       sin = Math.sin(rad),
-      run = about.x - pos.x,
-      rise = about.y - pos.y,
-      cx = cos * run + sin * rise + pos.x,
-      cy = cos * rise - sin * run + pos.y;
+      run = pos.x - about.x,
+      rise = pos.y - about.y,
+      cx = cos * run + sin * rise + about.x,
+      cy = cos * rise - sin * run + about.y;
     return {
       x: cx,
       y: cy,

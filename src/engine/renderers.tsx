@@ -1,6 +1,6 @@
 import React from 'react';
+import { SHOW_TRANSFORMATION_POINTS } from '..';
 import { Colors, MathUtil } from "./engine";
-import { Entities } from './entity';
 
 export class StyleConversions {
 
@@ -12,12 +12,14 @@ export class StyleConversions {
   }
 
   static ComputeEntityWorldTransformation = (es: EngineState) => (e: Entity): Transformation => {
-    const entityOrigin = Entities.GetEntityOrigin(es)(e);
-    const rotatedPoint = MathUtil.RotatePositionAboutPoint(e.properties.rotation)(entityOrigin)(e.properties.position);
+    const rotatedPoint = MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(e.properties.position);
+    let difX = rotatedPoint.x - e.properties.anchor.x, difY = rotatedPoint.y - e.properties.anchor.y;
     const t: Transformation = {
-      translation: rotatedPoint,
+      translation: { x: difX, y: difY },
+      finalPosition: rotatedPoint,
       scale: e.properties.scale,
-      rotation: e.properties.rotation
+      rotation: e.properties.rotation,
+      anchor: e.properties.anchor
     };
     return t;
   };
@@ -30,10 +32,10 @@ export class StyleConversions {
       width: e.properties.size.width,
       height: e.properties.size.height,
       left:
-        (es.config.width / 2) + t.translation.x -
+        (es.config.width / 2) + t.finalPosition.x -
         (t.scale.x * e.properties.size.width) / 2,
-      bottom:
-      (es.config.height / 2) + t.translation.y -
+      top:
+      (es.config.height / 2) + t.finalPosition.y -
         (t.scale.y * e.properties.size.height) / 2,
       transform: StyleConversions.CreateTransform([StyleConversions.CreateScale(t.scale), StyleConversions.CreateRotation(t.rotation)]),
     };
@@ -42,18 +44,18 @@ export class StyleConversions {
 }
 
 export class Renderers {
-  static BasicTextureRendererReact = (es: EngineState) => (
+  static BasicTextureRendererReact = (esInit: EngineState) => (
     t: Texture
   ): Render => {
-    const renderFunc: Render = (e: Entity) => {
+    const renderFunc: Render = (es: EngineState) => (e: Entity) => {
       const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
       const transformStyle = StyleConversions.TransformationToStyle(es)(tranformation, e);
       return <img src={t.url} alt={t.alt} style={transformStyle} />;
     };
     return renderFunc;
   };
-  static BoxRendererReact = (es: EngineState) => (c: Color): Render => {
-    const renderFunc: Render = (e: Entity) => {
+  static BoxRendererReact = (esInit: EngineState) => (c: Color): Render => {
+    const renderFunc: Render = (es: EngineState) => (e: Entity) => {
       const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
       const transformStyle = StyleConversions.TransformationToStyle(es)(tranformation, e);
       return (
@@ -64,12 +66,12 @@ export class Renderers {
     };
     return renderFunc;
   };
-  static BasicTextureRenderer = (es: EngineState) => {
+  static BasicTextureRenderer = (esInit: EngineState) => {
     return ((
     t: Texture
   ): Render => {
-    if(es.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
-    const renderFunc: Render = (e: Entity) => {
+    if(esInit.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
+    const renderFunc: Render = (es: EngineState) => (e: Entity) => {
       const transformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
       const transformStyle = StyleConversions.TransformationToStyle(es)(transformation, e);
       return <img src={t.url} alt={t.alt} style={transformStyle} />;
@@ -77,28 +79,47 @@ export class Renderers {
     return renderFunc;
     })
   };
-  static BoxRenderer = (es: EngineState) => {
-    if(es.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
+  static BoxRenderer = (esInit: EngineState) => {
+    if(esInit.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
     return ((c: Color): Render => {
-      const renderFunc: Render = (e: Entity) => {
+      const renderFunc: Render = (es: EngineState) => (e: Entity) => {
         if(es.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
         const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
         const at: Transformation = {
           ...tranformation,
-          translation: {
-            x: tranformation.translation.x - ((e.properties.size.width * tranformation.scale.x) / 2) + (es.config.width / 2),
-            y: es.config.height - (tranformation.translation.y - ((e.properties.size.height * tranformation.scale.y) / 2)) - (es.config.height / 2)
+          anchor: {
+            x: tranformation.anchor.x + (es.config.width / 2),
+            y: (es.config.height / 2) + tranformation.anchor.y
           }
         };
         const ctx = es.canvas?.getContext('2d');
         if(!ctx) throw new Error('Cannot get canvas context!');
         ctx.save();
-        ctx.fillStyle = "red";
+        ctx.fillStyle = Colors.ColorToString(c);
+        ctx.translate(at.anchor.x, at.anchor.y);
         ctx.translate(at.translation.x, at.translation.y);
-        ctx.rotate(at.rotation);
-        ctx.rect(-(e.properties.size.width * at.scale.x / 2), -(e.properties.size.height * at.scale.y / 2), (e.properties.size.width * at.scale.x), (e.properties.size.height * at.scale.y));
-        ctx.fill();
+        ctx.rotate(-at.rotation);
+        const boxWidth = (e.properties.size.width * at.scale.x);
+        const boxHeight = (e.properties.size.height * at.scale.y);
+        ctx.fillRect(-(boxWidth / 2), 
+        -(boxHeight / 2),
+        boxWidth, boxHeight);
         ctx.restore();
+        if(SHOW_TRANSFORMATION_POINTS){
+          ctx.save();
+          ctx.fillStyle = 'red';
+          ctx.translate(at.anchor.x, at.anchor.y);
+          // ctx.rotate(at.rotation);
+          ctx.fillRect(-10, -10, 20, 20);
+          ctx.restore();
+          ctx.save();
+          ctx.fillStyle = 'blue';
+          ctx.translate(at.anchor.x, at.anchor.y);
+          ctx.translate(at.translation.x, at.translation.y);
+          // ctx.rotate(at.rotation);
+          ctx.fillRect(-5, -5, 10, 10);
+          ctx.restore(); 
+        }
       };
       return renderFunc;
     });

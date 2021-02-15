@@ -14,10 +14,12 @@ declare global {
 
   export type Shader = (elt: JSX.Element, e: Entity) => JSX.Element;
 
-  export type Render = (e: Entity) => JSX.Element | any;
+  export type Render = (es: EngineState) => (e: Entity) => JSX.Element | any;
 
   export type EntityProps = {
     position: Vector2;
+    // the position about which
+    anchor: Vector2;
     // rotation in radians
     rotation: number;
     // X and Y scale
@@ -33,6 +35,8 @@ declare global {
     shaders: Shader[];
     uuid: string;
   };
+
+  export type FolderEntity = Entity & { entities: Entity[] }
 
   export type Camera = {
     position: Vector2;
@@ -64,6 +68,8 @@ declare global {
 
   export type Transformation = {
     translation: Vector2,
+    anchor: Vector2,
+    finalPosition: Vector2,
     scale: Vector2,
     rotation: number,
   }

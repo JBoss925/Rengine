@@ -1,4 +1,4 @@
-export class AnimationEngine {
+export class AnimationFactory {
 
   static OffsetAnimationComponent = (xFunc: (x: number, y: number) => number) => (yFunc: (x: number, y: number) => number) => 
   (beforeUpdate?: UpdateFunction) => (afterUpdate?: UpdateFunction): Component => {

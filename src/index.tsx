@@ -1,13 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import AppCanvas from './App';
-import AppReact from './App-React';
+import AppCanvas from './engine/app-renderers/App';
+import AppReact from './engine/app-renderers/App-React';
 import reportWebVitals from './reportWebVitals';
 
 type RenderingEngineOption = 'canvas' | 'react';
-let RENDERING_ENGINE = 'canvas';
-const App = (RENDERING_ENGINE === 'canvas') ? AppCanvas : AppReact;
+export const RENDERING_ENGINE: RenderingEngineOption = 'canvas';
+// @ts-ignore
+export const App = (RENDERING_ENGINE === 'canvas') ? AppCanvas : AppReact;
+export const SHOW_TRANSFORMATION_POINTS: boolean = true;
 
 ReactDOM.render(
   <React.StrictMode>
