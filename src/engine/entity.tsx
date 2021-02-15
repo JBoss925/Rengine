@@ -67,8 +67,23 @@ export class Entities {
   }
 
   static MakeFolderEntity = (state: EngineState) => (
-    entities: Entity[]
+    entities: Entity[], placeOriginAndAnchorAtGeometricCenter?: boolean
   ): FolderEntity => {
+    const applyFolderTransformation = (e: FolderEntity, ents: Entity[]): Entity[] => {
+      return ents.map((a) => {
+        const v = {
+          ...a,
+          properties: {
+            ...a.properties,
+            position: MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(Vec2.Add(a.properties.position)(e.properties.position)),
+            anchor: MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(Vec2.Add(a.properties.anchor)(e.properties.position)),
+            scale: Vec2.Mul(a.properties.scale)(e.properties.scale),
+            rotation: ((a.properties.rotation + e.properties.rotation) % (2 * Math.PI)),
+          }
+        };
+        return v;
+      });
+    };
     let bounds: BoundingBox[] = entities.map((e) =>
       Entities.ComputeEntityBoundingBox(state)(e)
     );
@@ -101,31 +116,20 @@ export class Entities {
       }
     }, bounds[0]).maxXmaxY.y;
     let newOriginPos: Vector2 = { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
-    const applyFolderTransformation = (e: FolderEntity, ents: Entity[]): Entity[] => {
-      return ents.map((a) => {
-        const v = {
-          ...a,
-          properties: {
-            ...a.properties,
-            position: MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(Vec2.Add(a.properties.position)(e.properties.position)),
-            anchor: MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(Vec2.Add(a.properties.anchor)(e.properties.position)),
-            scale: Vec2.Mul(a.properties.scale)(e.properties.scale),
-            rotation: ((a.properties.rotation + e.properties.rotation) % (2 * Math.PI)),
-          }
-        };
-        return v;
-      });
-    }
     entityID++;
+    let position: Vector2 = placeOriginAndAnchorAtGeometricCenter === true ? newOriginPos : { x: 0, y: 0 };
+    let halfMaxDim = [minX, maxX, minY, maxY].reduce((p, c) => (Math.abs(c) > p ? c : p), 0);
     let ret: FolderEntity = {
       uuid: String(entityID),
-      entities: entities,
+      entities: placeOriginAndAnchorAtGeometricCenter === true 
+      ? entities.map(a => { return {...a, properties: {...a.properties, position: Vec2.Sub(a.properties.position)(position), anchor: Vec2.Sub(a.properties.position)(position), }}})
+      : entities,
       properties: {
-        position: newOriginPos,
-        anchor: newOriginPos,
+        position: position,
+        anchor: position,
         scale: { x: 1, y: 1 },
         rotation: 0,
-        size: { width: maxX - minX, height: maxY - minY },
+        size: placeOriginAndAnchorAtGeometricCenter === true ? { width: maxX - minX, height: maxY - minY } : { width: halfMaxDim * 2, height: halfMaxDim * 2 },
       },
       components: [{
         update: (delta, ent, s, ps) => {
