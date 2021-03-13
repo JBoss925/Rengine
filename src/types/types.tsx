@@ -1,6 +1,7 @@
 export {};
 
 declare global {
+
   export type Vector2 = {
     x: number;
     y: number;
@@ -98,4 +99,5 @@ declare global {
     config: GlobalConfig;
     canvas: HTMLCanvasElement | null;
   };
+  
 }
