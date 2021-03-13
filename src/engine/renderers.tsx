@@ -44,32 +44,6 @@ export class StyleConversions {
 }
 
 export class Renderers {
-  static BasicTextureRenderer = (esInit: EngineState) => (
-    t: Texture
-  ): Render => {
-    if(RENDERING_ENGINE === "react"){
-      const renderFunc: Render = (es: EngineState) => (e: Entity) => {
-        const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
-        const transformStyle = StyleConversions.TransformationToStyle(es)(tranformation, e);
-        return <img src={t.url} alt={t.alt} style={transformStyle} />;
-      };
-      return renderFunc;
-    } else {
-      throw new Error("unimplemented!");
-    }
-  };
-  static BoxRendererReact = (esInit: EngineState) => (c: Color): Render => {
-    const renderFunc: Render = (es: EngineState) => (e: Entity) => {
-      const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
-      const transformStyle = StyleConversions.TransformationToStyle(es)(tranformation, e);
-      return (
-        <div
-          style={{ ...transformStyle, background: Colors.ColorToString(c) }}
-        />
-      );
-    };
-    return renderFunc;
-  };
   static BoxRenderer = (esInit: EngineState) => {
     if(RENDERING_ENGINE === "canvas"){
       if(esInit.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
@@ -139,6 +113,20 @@ export class Renderers {
       }
     } else {
       throw new Error('unimplemented!');
+    }
+  };
+  static BasicTextureRenderer = (esInit: EngineState) => (
+    t: Texture
+  ): Render => {
+    if(RENDERING_ENGINE === "react"){
+      const renderFunc: Render = (es: EngineState) => (e: Entity) => {
+        const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
+        const transformStyle = StyleConversions.TransformationToStyle(es)(tranformation, e);
+        return <img src={t.url} alt={t.alt} style={transformStyle} />;
+      };
+      return renderFunc;
+    } else {
+      throw new Error("unimplemented!");
     }
   };
 }
