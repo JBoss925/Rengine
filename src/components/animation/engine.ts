@@ -1,6 +1,6 @@
 export class AnimationFactory {
 
-  static OffsetAnimationComponent = (xFunc: (x: number, y: number) => number) => (yFunc: (x: number, y: number) => number) => 
+  static OffsetAnimationComponent = (xFunc: (delta: number, x: number, y: number) => number) => (yFunc: (delta: number, x: number, y: number) => number) => 
   (beforeUpdate?: UpdateFunction) => (afterUpdate?: UpdateFunction): Component => {
     return {
       update: (d, e, s, ps) => {
@@ -10,8 +10,8 @@ export class AnimationFactory {
           ps = esR;
         }
         e.properties.position = {
-          x: e.properties.position.x + xFunc(e.properties.position.x, e.properties.position.y),
-          y: e.properties.position.y + yFunc(e.properties.position.x, e.properties.position.y),
+          x: e.properties.position.x + xFunc(d, e.properties.position.x, e.properties.position.y),
+          y: e.properties.position.y + yFunc(d, e.properties.position.x, e.properties.position.y),
         };
         if(afterUpdate){ 
           let [eAR, eAsR] = afterUpdate(d, e, s, ps);
@@ -23,7 +23,7 @@ export class AnimationFactory {
     };
   };
   
-  static PositionAnimationComponent = (xFunc: (x: number, y: number) => number) => (yFunc: (x: number, y: number) => number) =>
+  static PositionAnimationComponent = (xFunc: (delta: number, x: number, y: number) => number) => (yFunc: (delta: number, x: number, y: number) => number) =>
   (beforeUpdate?: UpdateFunction) => (afterUpdate?: UpdateFunction): Component => {
     return {
       update: (d, e, s, ps) => {
@@ -33,8 +33,8 @@ export class AnimationFactory {
           ps = esR;
         }
         e.properties.position = {
-          x: xFunc(e.properties.position.x, e.properties.position.y),
-          y: yFunc(e.properties.position.x, e.properties.position.y),
+          x: xFunc(d, e.properties.position.x, e.properties.position.y),
+          y: yFunc(d, e.properties.position.x, e.properties.position.y),
         };
         if(afterUpdate){ 
           let [eAR, eAsR] = afterUpdate(d, e, s, ps);

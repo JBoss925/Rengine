@@ -1,5 +1,5 @@
 import React from 'react';
-import { RENDERING_ENGINE, SHOW_TRANSFORMATION_POINTS } from '..';
+import { RENDERING_ENGINE, SHOW_TRANSFORMATION_POINTS } from '../Lifecycle';
 import { MathUtil, Vec2 } from "./engine";
 import { StyleConversions } from './renderers';
 
@@ -23,49 +23,6 @@ export class Entities {
     };
   };
 
-  static GetEntityOrigin = (es: EngineState) => (e: Entity): Vector2 => {
-    let origin: Vector2;
-    if (es.config.origin === "center") {
-      origin = e.properties.position;
-    } else if (es.config.origin === "topleft") {
-      origin = {
-        x:
-          e.properties.position.x -
-          (e.properties.scale.x * e.properties.size.width) / 2,
-        y:
-          e.properties.position.y +
-          (e.properties.scale.y * e.properties.size.height) / 2,
-      };
-    } else if (es.config.origin === "bottomleft") {
-      origin = {
-        x:
-          e.properties.position.x -
-          (e.properties.scale.x * e.properties.size.width) / 2,
-        y:
-          e.properties.position.y -
-          (e.properties.scale.y * e.properties.size.height) / 2,
-      };
-    } else {
-      throw new Error("No such origin location option: " + es.config.origin);
-    }
-    return origin;
-  };
-
-  static GetEntityBBOrigin = (es: EngineState) => (e: Entity): Vector2 => {
-    const eBB = Entities.ComputeEntityBoundingBox(es)(e);
-    let newOriginPos: Vector2;
-    if (es.config.origin === "center") {
-      newOriginPos = { x: (eBB.minXminY.x + eBB.maxXmaxY.x) / 2, y: (eBB.minXminY.y + eBB.maxXmaxY.y) / 2 };
-    } else if (es.config.origin === "topleft") {
-      newOriginPos = eBB.minXmaxY;
-    } else if (es.config.origin === "bottomleft") {
-      newOriginPos = eBB.minXminY;
-    } else {
-      throw new Error("No such origin location: " + es.config.origin);
-    }
-    return newOriginPos;
-  }
-
   static MakeFolderEntity = (state: EngineState) => (
     entities: Entity[], placeOriginAndAnchorAtGeometricCenter?: boolean
   ): FolderEntity => {
@@ -75,8 +32,8 @@ export class Entities {
           ...a,
           properties: {
             ...a.properties,
-            position: MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(Vec2.Add(a.properties.position)(e.properties.position)),
-            anchor: MathUtil.RotatePositionAboutPoint(e.properties.rotation)(e.properties.anchor)(Vec2.Add(a.properties.anchor)(e.properties.position)),
+            position: Vec2.Add(a.properties.position)(MathUtil.RotatePositionAboutPoint(-e.properties.rotation)(e.properties.anchor)((e.properties.position))),
+            anchor: Vec2.Add(a.properties.anchor)(MathUtil.RotatePositionAboutPoint(-e.properties.rotation)(e.properties.anchor)((e.properties.position))),
             scale: Vec2.Mul(a.properties.scale)(e.properties.scale),
             rotation: ((a.properties.rotation + e.properties.rotation) % (2 * Math.PI)),
           }
@@ -85,7 +42,7 @@ export class Entities {
       });
     };
     let bounds: BoundingBox[] = entities.map((e) =>
-      Entities.ComputeEntityBoundingBox(state)(e)
+      EntitiesUtils.ComputeEntityBoundingBox(state)(e)
     );
     let minX = bounds.reduce((pr, cu) => {
       if (cu.minXminY.x < pr.minXminY.x) {
@@ -174,6 +131,14 @@ export class Entities {
             // ctx.rotate(at.rotation);
             ctx.fillRect(-5, -5, 10, 10);
             ctx.restore(); 
+            ctx.save();
+            ctx.strokeStyle = 'black';
+            ctx.translate(at.anchor.x, at.anchor.y);
+            ctx.translate(at.translation.x, at.translation.y);
+            ctx.moveTo(0,0);
+            ctx.lineTo(-at.translation.x, -at.translation.y);
+            ctx.stroke();
+            ctx.restore();
           } else {
             throw new Error('Transformation point rendering not currently supported in React.');
           }
@@ -184,10 +149,57 @@ export class Entities {
     return ret;
   };
 
+}
+
+class EntitiesUtils {
+
+  static GetEntityOrigin = (es: EngineState) => (e: Entity): Vector2 => {
+    let origin: Vector2;
+    if (es.config.origin === "center") {
+      origin = e.properties.position;
+    } else if (es.config.origin === "topleft") {
+      origin = {
+        x:
+          e.properties.position.x -
+          (e.properties.scale.x * e.properties.size.width) / 2,
+        y:
+          e.properties.position.y +
+          (e.properties.scale.y * e.properties.size.height) / 2,
+      };
+    } else if (es.config.origin === "bottomleft") {
+      origin = {
+        x:
+          e.properties.position.x -
+          (e.properties.scale.x * e.properties.size.width) / 2,
+        y:
+          e.properties.position.y -
+          (e.properties.scale.y * e.properties.size.height) / 2,
+      };
+    } else {
+      throw new Error("No such origin location option: " + es.config.origin);
+    }
+    return origin;
+  };
+
+  static GetEntityBBOrigin = (es: EngineState) => (e: Entity): Vector2 => {
+    const eBB = EntitiesUtils.ComputeEntityBoundingBox(es)(e);
+    let newOriginPos: Vector2;
+    if (es.config.origin === "center") {
+      newOriginPos = { x: (eBB.minXminY.x + eBB.maxXmaxY.x) / 2, y: (eBB.minXminY.y + eBB.maxXmaxY.y) / 2 };
+    } else if (es.config.origin === "topleft") {
+      newOriginPos = eBB.minXmaxY;
+    } else if (es.config.origin === "bottomleft") {
+      newOriginPos = eBB.minXminY;
+    } else {
+      throw new Error("No such origin location: " + es.config.origin);
+    }
+    return newOriginPos;
+  }
+
   static ComputeEntityBoundingBox = (es: EngineState) => (
     e: Entity
   ): BoundingBox => {
-    let origin: Vector2 = Entities.GetEntityOrigin(es)(e);
+    let origin: Vector2 = EntitiesUtils.GetEntityOrigin(es)(e);
     let pointsToConsider: Vector2[] = [
       {
         x:

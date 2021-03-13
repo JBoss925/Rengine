@@ -6,10 +6,13 @@ declare global {
     y: number;
   };
 
+  type RenderingEngineOption = 'canvas' | 'react';
+  type LoopMode = 'interval' | 'animation';
+
   type UpdateFunction = (delta: number, e: Entity, s: Scene, prevState: EngineState) => [Entity, EngineState];
 
   export type Component = {
-    update: UpdateFunction;
+    update: (delta: number, e: Entity, s: Scene, prevState: EngineState) => [Entity, EngineState];
   };
 
   export type Shader = (elt: JSX.Element, e: Entity) => JSX.Element;

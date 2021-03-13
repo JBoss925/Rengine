@@ -34,7 +34,7 @@ export class Scenes {
     newState.scenes = newState.scenes.map((a) => {
       if (a.uuid !== foundScene?.uuid) return a;
       changedScene = {
-        ...foundScene,
+        ...a,
         entities: a.entities.concat(e)
       };
       return changedScene;
