@@ -1,46 +1,96 @@
-# Getting Started with Create React App
+# Rengine
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Rengine is a small rendering and game engine experiment built in TypeScript. The project explores a few core engine ideas in a compact codebase: scenes, entities, folder-style transform hierarchies, game-loop updates, renderer abstraction, and lightweight animation components.
 
-## Available Scripts
+The demo app in this repo is a sandbox for visualizing those ideas. It can render through a canvas renderer or a React renderer, and the active demo scene is configured in [`src/Lifecycle.tsx`](./src/Lifecycle.tsx).
 
-In the project directory, you can run:
+## What It Shows Off
 
-### `yarn start`
+- Entity construction through `Rengine.Entity.MakeEntity(...)`
+- Nested transform composition through folder entities
+- Scene creation and activation through `Rengine.Scene`
+- A game-loop/update model separated from rendering
+- Swappable rendering output (`canvas` or `react`)
+- Debug transform markers for anchors, positions, and relationships
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Project Structure
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- [`src/engine/engine.tsx`](./src/engine/engine.tsx)
+  Aggregates the main engine modules and exposes helpers like vector math and color utilities.
 
-### `yarn test`
+- [`src/engine/entity.tsx`](./src/engine/entity.tsx)
+  Defines entities and folder entities, including transform propagation and debug transformation-point rendering.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- [`src/engine/scene.tsx`](./src/engine/scene.tsx)
+  Handles scene creation, activation, and scene/entity membership.
 
-### `yarn build`
+- [`src/engine/renderers.tsx`](./src/engine/renderers.tsx)
+  Contains renderer helpers used by entities to draw themselves.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [`src/engine/Loop.tsx`](./src/engine/Loop.tsx)
+  Drives the update/render loop.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- [`src/Lifecycle.tsx`](./src/Lifecycle.tsx)
+  Configures the active renderer, loop behavior, debug options, and which demo scene is loaded on startup.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Demos
 
-### `yarn eject`
+The built-in demos live in [`src/Lifecycle.tsx`](./src/Lifecycle.tsx). They focus on different transform and animation behaviors:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- `demoPurpleCube1`
+  Nested rotating parents around a single cube.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `demoPurpleCube2`
+  Counter-rotation and parent motion to keep the child visually stable.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- `demoPurpleCube3`
+  A more involved hierarchy with multiple animated rotating parents.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- `demoMultiCubeInLine`
+  Multiple independently rotating cubes laid out in a line.
 
-## Learn More
+- `demoMultiCubeInPlace`
+  Multiple cubes rotating around their own anchors.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- `demoTimeDif`
+  A timing-oriented test used with the update loop.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Debug Visualization
+
+Transformation-point rendering can be toggled in [`src/Lifecycle.tsx`](./src/Lifecycle.tsx):
+
+```ts
+export const SHOW_TRANSFORMATION_POINTS: boolean = true;
+```
+
+When enabled, the debug overlay shows:
+
+- Blue square: entity position
+- Red square: entity anchor
+- Black line: anchor-to-position relationship
+
+This overlay is currently implemented for the canvas renderer path.
+
+## Running Locally
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the dev server:
+
+```bash
+npm start
+```
+
+Build the project:
+
+```bash
+npm run build
+```
+
+## Why This Repo Exists
+
+Rengine is less about shipping a complete game and more about experimenting with engine boundaries. It is a compact playground for testing how scene graphs, hierarchical transforms, update components, and rendering strategies fit together in TypeScript.

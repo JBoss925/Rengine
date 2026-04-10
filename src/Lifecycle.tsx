@@ -26,16 +26,16 @@ import { AnimationFactory } from './components/animation/engine';
 
 export const RENDERING_ENGINE: RenderingEngineOption = 'canvas';
 export const LOOP_MODE: LoopMode = 'animation';
-export const SHOW_TRANSFORMATION_POINTS: boolean = false;
+export const SHOW_TRANSFORMATION_POINTS: boolean = true;
 export const FPS_LIMIT = 60;
 
 export const init = (canvas?: HTMLCanvasElement): EngineState => {
   let engineState = Rengine.Game.InitEngine(undefined, canvas);
   engineState = Rengine.Scene.CreateScene(engineState)('root', true);
   
-  return demoPurpleCube1(engineState);
+  return demoPurpleCube3(engineState);
   // return demoPurpleCube2(engineState);
-  // return demoPurpleCube3(engineState);
+  // return demoPurpleCube1(engineState);
   // return demoMultiCubeInLine(engineState, 20);
   // return demoMultiCubeInPlace(engineState, 20);
   // return demoTimeDif(engineState);
