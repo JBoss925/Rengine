@@ -195,16 +195,13 @@ export function advanceRuntimeScene(
 }
 
 export function renderRuntimeScene(
-  _ctx: CanvasRenderingContext2D,
+  ctx: CanvasRenderingContext2D,
   runtime: RuntimeScene,
   viewport: Dimensions,
   showWireframes: boolean
 ) {
-  const canvas = runtime.engineState.canvas;
-
-  if (!canvas) {
-    return;
-  }
+  const canvas = ctx.canvas;
+  runtime.engineState.canvas = canvas;
 
   runtime.engineState.config = {
     ...runtime.engineState.config,
@@ -214,15 +211,9 @@ export function renderRuntimeScene(
     showTransformationPoints: showWireframes
   };
 
-  const context = canvas.getContext("2d");
-
-  if (!context) {
-    return;
-  }
-
-  context.clearRect(0, 0, viewport.width, viewport.height);
-  context.fillStyle = "#f8fbff";
-  context.fillRect(0, 0, viewport.width, viewport.height);
+  ctx.clearRect(0, 0, viewport.width, viewport.height);
+  ctx.fillStyle = "#f8fbff";
+  ctx.fillRect(0, 0, viewport.width, viewport.height);
 
   runtime.engineState.activeScene?.entities.forEach((entity) => {
     entity.render(runtime.engineState)(entity);

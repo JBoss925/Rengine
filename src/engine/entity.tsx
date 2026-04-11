@@ -139,6 +139,7 @@ export class Entities {
             ctx.strokeStyle = 'black';
             ctx.translate(at.anchor.x, at.anchor.y);
             ctx.translate(at.translation.x, at.translation.y);
+            ctx.beginPath();
             ctx.moveTo(0,0);
             ctx.lineTo(-at.translation.x, -at.translation.y);
             ctx.stroke();
