@@ -29,7 +29,13 @@ export class Games {
     return {
       scenes: [],
       activeScene: null,
-      config: config ?? { origin: 'center', width: window.innerWidth, height: window.innerHeight },
+      config: config ?? {
+        origin: 'center',
+        width: window.innerWidth,
+        height: window.innerHeight,
+        renderingEngine: 'canvas',
+        showTransformationPoints: true
+      },
       canvas: canvas ?? null
     };
   };

@@ -106,7 +106,11 @@ export class Entities {
       render: (es: EngineState) => (ent: Entity) => {
         let e: FolderEntity = ent as FolderEntity;
         let vals = applyFolderTransformation(e, e.entities).map((a) => { return a.render(es)(a); }).map((a, ind) => { return {...a, key: ind }; });
-        if(SHOW_TRANSFORMATION_POINTS){
+        const showTransformationPoints =
+          es.config.showTransformationPoints ?? SHOW_TRANSFORMATION_POINTS;
+        const renderingEngine = es.config.renderingEngine ?? RENDERING_ENGINE;
+
+        if(showTransformationPoints){
           const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
           const at: Transformation = {
             ...tranformation,
@@ -115,7 +119,7 @@ export class Entities {
               y: (es.config.height / 2) + tranformation.anchor.y
             }
           };
-          if(RENDERING_ENGINE === 'canvas'){
+          if(renderingEngine === 'canvas'){
             const ctx = es.canvas?.getContext('2d');
             if(!ctx) throw new Error('Cannot get canvas context!');
             ctx.save();

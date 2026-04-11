@@ -45,11 +45,15 @@ export class StyleConversions {
 
 export class Renderers {
   static BoxRenderer = (esInit: EngineState) => {
-    if(RENDERING_ENGINE === "canvas"){
+    const renderingEngine = esInit.config.renderingEngine ?? RENDERING_ENGINE;
+
+    if(renderingEngine === "canvas"){
       if(esInit.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
       return ((c: Color): Render => {
         const renderFunc: Render = (es: EngineState) => (e: Entity) => {
           if(es.canvas === null) throw new Error('Cannot render with a canvas renderer without a canvas being linked to the engine state!');
+          const showTransformationPoints =
+            es.config.showTransformationPoints ?? SHOW_TRANSFORMATION_POINTS;
           const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);
           const at: Transformation = {
             ...tranformation,
@@ -71,7 +75,7 @@ export class Renderers {
           -(boxHeight / 2),
           boxWidth, boxHeight);
           ctx.restore();
-          if(SHOW_TRANSFORMATION_POINTS){
+          if(showTransformationPoints){
             ctx.save();
             ctx.fillStyle = 'red';
             ctx.translate(at.anchor.x, at.anchor.y);
@@ -95,10 +99,13 @@ export class Renderers {
         };
         return renderFunc;
       });
-    } else if (RENDERING_ENGINE === "react"){
+    } else if (renderingEngine === "react"){
       return (c: Color): Render => {
         const renderFunc: Render = (es: EngineState) => (e: Entity) => {
-          if(SHOW_TRANSFORMATION_POINTS){
+          const showTransformationPoints =
+            es.config.showTransformationPoints ?? SHOW_TRANSFORMATION_POINTS;
+
+          if(showTransformationPoints){
             throw new Error('Transformation point rendering not currently supported in React.');
           }
           const tranformation = StyleConversions.ComputeEntityWorldTransformation(es)(e);

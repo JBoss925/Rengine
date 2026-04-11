@@ -13,6 +13,7 @@ declare global {
   type UpdateFunction = (delta: number, e: Entity, s: Scene, prevState: EngineState) => [Entity, EngineState];
 
   export type Component = {
+    label?: string;
     update: (delta: number, e: Entity, s: Scene, prevState: EngineState) => [Entity, EngineState];
   };
 
@@ -38,6 +39,8 @@ declare global {
     render: Render;
     shaders: Shader[];
     uuid: string;
+    label?: string;
+    debugColor?: string;
   };
 
   export type FolderEntity = Entity & { entities: Entity[] }
@@ -84,6 +87,8 @@ declare global {
     origin: OriginLocation;
     width: number;
     height: number;
+    renderingEngine?: RenderingEngineOption;
+    showTransformationPoints?: boolean;
   };
 
   export type BoundingBox = {

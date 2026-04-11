@@ -1,6 +1,7 @@
 import Rengine, { Colors } from "./engine/engine";
 import { EndGameLoop, FRAMES_SINCE_STARTUP } from "./engine/Loop";
 import { AnimationFactory } from './components/animation/engine';
+import { applyDemoToEngineState, tickDemoRuntime } from "./runtime/demos";
 
 /**
  * Welcome to the dev sesh! Here's a quick overview of what each
@@ -28,17 +29,13 @@ export const RENDERING_ENGINE: RenderingEngineOption = 'canvas';
 export const LOOP_MODE: LoopMode = 'animation';
 export const SHOW_TRANSFORMATION_POINTS: boolean = true;
 export const FPS_LIMIT = 60;
+const DEFAULT_DEMO_ID = "demoPurpleCube3";
 
 export const init = (canvas?: HTMLCanvasElement): EngineState => {
   let engineState = Rengine.Game.InitEngine(undefined, canvas);
   engineState = Rengine.Scene.CreateScene(engineState)('root', true);
-  
-  return demoPurpleCube3(engineState);
-  // return demoPurpleCube2(engineState);
-  // return demoPurpleCube1(engineState);
-  // return demoMultiCubeInLine(engineState, 20);
-  // return demoMultiCubeInPlace(engineState, 20);
-  // return demoTimeDif(engineState);
+
+  return applyDemoToEngineState(engineState, DEFAULT_DEMO_ID);
 }
 
 let timePassed = 0;
@@ -46,19 +43,20 @@ let secondBoxAdded = false;
 
 export const update = (delta: number, es: EngineState): EngineState => {
   timePassed += delta;
-  if(!secondBoxAdded && 
-    FRAMES_SINCE_STARTUP > 120
-    // timePassed > 2000
-    // why is timePassed > 2000 better for syncing?
-    ){
-    secondBoxAdded = true;
-    // NOTE: This return statement is for demoTimeDif
-    // return addSecondBox(es);
-  }
+  const runtimeState = {
+    engineState: es,
+    elapsedMs: timePassed,
+    framesSinceStartup: FRAMES_SINCE_STARTUP,
+    metadata: { secondBoxAdded }
+  };
+
+  tickDemoRuntime(runtimeState, DEFAULT_DEMO_ID, delta);
+  secondBoxAdded = runtimeState.metadata.secondBoxAdded === true;
+
   if(timePassed > 20000){
     EndGameLoop();
   }
-  return es;
+  return runtimeState.engineState;
 }
 
 
