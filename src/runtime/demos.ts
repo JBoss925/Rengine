@@ -1,5 +1,6 @@
 import Rengine, { Colors } from "../engine/engine";
 import { AnimationFactory } from "../components/animation/engine";
+import { getWireframeColors } from "../engine/debugColors";
 
 export type RuntimeDemoDefinition = {
   id: string;
@@ -18,6 +19,34 @@ export type DemoRuntimeState = {
     secondBoxAdded?: boolean;
   };
 };
+
+type DemoColors = {
+  primary: Color;
+  secondary: Color;
+};
+
+function hexToColor(hex: string): Color {
+  const normalized = hex.replace("#", "");
+  const padded = normalized.length === 3
+    ? normalized.split("").map((part) => `${part}${part}`).join("")
+    : normalized;
+
+  return {
+    r: parseInt(padded.slice(0, 2), 16),
+    g: parseInt(padded.slice(2, 4), 16),
+    b: parseInt(padded.slice(4, 6), 16),
+    a: 1
+  };
+}
+
+function getDemoColors(engineState: EngineState): DemoColors {
+  const wireframeColors = getWireframeColors(engineState.config);
+
+  return {
+    primary: hexToColor(wireframeColors.anchor),
+    secondary: hexToColor(wireframeColors.position)
+  };
+}
 
 function createComponent(
   label: string,
@@ -80,6 +109,7 @@ function addEntityToRoot(engineState: EngineState, entity: Entity): EngineState 
 
 function createPurpleCube1Scene(engineStateIn: EngineState): EngineState {
   let engineState = engineStateIn;
+  const demoColors = getDemoColors(engineState);
   const box = createBox(
     engineState,
     {
@@ -90,7 +120,7 @@ function createPurpleCube1Scene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(1, 0.4)],
-    Colors.rgbaToColor(255, 0, 255, 1),
+    demoColors.primary,
     "Cube"
   );
   const folder = createFolder(engineState, [box], "Inner Pivot");
@@ -108,6 +138,7 @@ function createPurpleCube1Scene(engineStateIn: EngineState): EngineState {
 
 function createPurpleCube2Scene(engineStateIn: EngineState): EngineState {
   let engineState = engineStateIn;
+  const demoColors = getDemoColors(engineState);
   const box = createBox(
     engineState,
     {
@@ -118,7 +149,7 @@ function createPurpleCube2Scene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(-1, 1), createVelocityComponent(10, 10)],
-    Colors.rgbaToColor(255, 0, 255, 1),
+    demoColors.primary,
     "Counter-Rotating Cube"
   );
   const folder = createFolder(engineState, [box], "Parent Pivot");
@@ -132,6 +163,7 @@ function createPurpleCube2Scene(engineStateIn: EngineState): EngineState {
 
 function createPurpleCube3Scene(engineStateIn: EngineState): EngineState {
   let engineState = engineStateIn;
+  const demoColors = getDemoColors(engineState);
   const box = createBox(
     engineState,
     {
@@ -142,7 +174,7 @@ function createPurpleCube3Scene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(-1, 3)],
-    Colors.rgbaToColor(255, 0, 255, 1),
+    demoColors.primary,
     "Fast Cube"
   );
   const folder = createFolder(engineState, [box], "Inner Moving Pivot");
@@ -157,6 +189,7 @@ function createPurpleCube3Scene(engineStateIn: EngineState): EngineState {
 
 function createMultiCubeInLineScene(engineStateIn: EngineState, amount = 20): EngineState {
   let engineState = engineStateIn;
+  const demoColors = getDemoColors(engineState);
 
   for (let index = 0; index < amount; index += 1) {
     const box = createBox(
@@ -169,7 +202,7 @@ function createMultiCubeInLineScene(engineStateIn: EngineState, amount = 20): En
         scale: { x: 1, y: 1 }
       },
       [createRotationComponent(1, 0.3)],
-      Colors.rgbaToColor(255, 0, 255, 1),
+      demoColors.primary,
       `Cube ${index + 1}`
     );
     engineState = addEntityToRoot(engineState, box);
@@ -180,6 +213,7 @@ function createMultiCubeInLineScene(engineStateIn: EngineState, amount = 20): En
 
 function createMultiCubeInPlaceScene(engineStateIn: EngineState, amount = 20): EngineState {
   let engineState = engineStateIn;
+  const demoColors = getDemoColors(engineState);
 
   for (let index = 0; index < amount; index += 1) {
     const box = createBox(
@@ -192,7 +226,7 @@ function createMultiCubeInPlaceScene(engineStateIn: EngineState, amount = 20): E
         scale: { x: 1, y: 1 }
       },
       [createRotationComponent(1, 1)],
-      Colors.rgbaToColor(255, 0, 255, 1),
+      demoColors.primary,
       `Local Pivot Cube ${index + 1}`
     );
     engineState = addEntityToRoot(engineState, box);
@@ -203,6 +237,7 @@ function createMultiCubeInPlaceScene(engineStateIn: EngineState, amount = 20): E
 
 function createTimeDifScene(engineStateIn: EngineState): EngineState {
   let engineState = engineStateIn;
+  const demoColors = getDemoColors(engineState);
   const box = createBox(
     engineState,
     {
@@ -213,7 +248,7 @@ function createTimeDifScene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(1, 1)],
-    Colors.rgbaToColor(255, 0, 255, 1),
+    demoColors.primary,
     "Primary Box"
   );
   engineState = addEntityToRoot(engineState, box);
@@ -221,6 +256,7 @@ function createTimeDifScene(engineStateIn: EngineState): EngineState {
 }
 
 function addSecondBox(runtime: DemoRuntimeState) {
+  const demoColors = getDemoColors(runtime.engineState);
   const box = createBox(
     runtime.engineState,
     {
@@ -231,7 +267,7 @@ function addSecondBox(runtime: DemoRuntimeState) {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(1, 1)],
-    Colors.rgbaToColor(0, 0, 255, 1),
+    demoColors.secondary,
     "Late Box"
   );
   runtime.engineState = addEntityToRoot(runtime.engineState, box);

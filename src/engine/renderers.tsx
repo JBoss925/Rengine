@@ -1,5 +1,6 @@
 import React from 'react';
 import { RENDERING_ENGINE, SHOW_TRANSFORMATION_POINTS } from '../Lifecycle';
+import { getWireframeColors } from "./debugColors";
 import { Colors, MathUtil } from "./engine";
 
 export class StyleConversions {
@@ -76,19 +77,20 @@ export class Renderers {
           boxWidth, boxHeight);
           ctx.restore();
           if(showTransformationPoints){
+            const wireframeColors = getWireframeColors(es.config);
             ctx.save();
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = wireframeColors.anchor;
             ctx.translate(at.anchor.x, at.anchor.y);
             ctx.fillRect(-10, -10, 20, 20);
             ctx.restore();
             ctx.save();
-            ctx.fillStyle = 'blue';
+            ctx.fillStyle = wireframeColors.position;
             ctx.translate(at.anchor.x, at.anchor.y);
             ctx.translate(at.translation.x, at.translation.y);
             ctx.fillRect(-5, -5, 10, 10);
             ctx.restore();
             ctx.save();
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = wireframeColors.relationship;
             ctx.translate(at.anchor.x, at.anchor.y);
             ctx.translate(at.translation.x, at.translation.y);
             ctx.beginPath();

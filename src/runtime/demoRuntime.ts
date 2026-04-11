@@ -35,6 +35,10 @@ export type RuntimeScene = DemoRuntimeState & {
   demoId: string;
 };
 
+export type RuntimeSetupOptions = {
+  wireframeColors?: Partial<WireframeColors>;
+};
+
 type EntityLike = Entity & {
   entities?: EntityLike[];
 };
@@ -151,7 +155,8 @@ export { rengineDemos };
 export function createRuntimeScene(
   demoId: string,
   canvas?: HTMLCanvasElement,
-  viewport?: Dimensions
+  viewport?: Dimensions,
+  options?: RuntimeSetupOptions
 ): RuntimeScene {
   const runtimeCanvas =
     canvas ??
@@ -163,7 +168,8 @@ export function createRuntimeScene(
       width: viewport?.width ?? window.innerWidth,
       height: viewport?.height ?? window.innerHeight,
       renderingEngine: "canvas",
-      showTransformationPoints: true
+      showTransformationPoints: true,
+      wireframeColors: options?.wireframeColors
     },
     runtimeCanvas
   );

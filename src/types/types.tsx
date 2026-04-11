@@ -81,6 +81,12 @@ declare global {
     rotation: number,
   }
 
+  export type WireframeColors = {
+    anchor: string;
+    position: string;
+    relationship: string;
+  };
+
   export type OriginLocation = "center" | "topleft" | "bottomleft";
 
   export type GlobalConfig = {
@@ -89,6 +95,7 @@ declare global {
     height: number;
     renderingEngine?: RenderingEngineOption;
     showTransformationPoints?: boolean;
+    wireframeColors?: Partial<WireframeColors>;
   };
 
   export type BoundingBox = {
