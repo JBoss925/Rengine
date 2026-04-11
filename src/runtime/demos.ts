@@ -23,6 +23,7 @@ export type DemoRuntimeState = {
 type DemoColors = {
   primary: Color;
   secondary: Color;
+  cube: Color;
 };
 
 function hexToColor(hex: string): Color {
@@ -44,7 +45,8 @@ function getDemoColors(engineState: EngineState): DemoColors {
 
   return {
     primary: hexToColor(wireframeColors.anchor),
-    secondary: hexToColor(wireframeColors.position)
+    secondary: hexToColor(wireframeColors.position),
+    cube: hexToColor("#4be3a9")
   };
 }
 
@@ -120,7 +122,7 @@ function createPurpleCube1Scene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(1, 0.4)],
-    demoColors.primary,
+    demoColors.cube,
     "Cube"
   );
   const folder = createFolder(engineState, [box], "Inner Pivot");
@@ -149,7 +151,7 @@ function createPurpleCube2Scene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(-1, 1), createVelocityComponent(10, 10)],
-    demoColors.primary,
+    demoColors.cube,
     "Counter-Rotating Cube"
   );
   const folder = createFolder(engineState, [box], "Parent Pivot");
@@ -174,7 +176,7 @@ function createPurpleCube3Scene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(-1, 3)],
-    demoColors.primary,
+    demoColors.cube,
     "Fast Cube"
   );
   const folder = createFolder(engineState, [box], "Inner Moving Pivot");
@@ -202,7 +204,7 @@ function createMultiCubeInLineScene(engineStateIn: EngineState, amount = 20): En
         scale: { x: 1, y: 1 }
       },
       [createRotationComponent(1, 0.3)],
-      demoColors.primary,
+      demoColors.cube,
       `Cube ${index + 1}`
     );
     engineState = addEntityToRoot(engineState, box);
@@ -226,7 +228,7 @@ function createMultiCubeInPlaceScene(engineStateIn: EngineState, amount = 20): E
         scale: { x: 1, y: 1 }
       },
       [createRotationComponent(1, 1)],
-      demoColors.primary,
+      demoColors.cube,
       `Local Pivot Cube ${index + 1}`
     );
     engineState = addEntityToRoot(engineState, box);
@@ -248,7 +250,7 @@ function createTimeDifScene(engineStateIn: EngineState): EngineState {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(1, 1)],
-    demoColors.primary,
+    demoColors.cube,
     "Primary Box"
   );
   engineState = addEntityToRoot(engineState, box);
@@ -267,7 +269,7 @@ function addSecondBox(runtime: DemoRuntimeState) {
       scale: { x: 1, y: 1 }
     },
     [createRotationComponent(1, 1)],
-    demoColors.secondary,
+    hexToColor("#9353db"),
     "Late Box"
   );
   runtime.engineState = addEntityToRoot(runtime.engineState, box);
