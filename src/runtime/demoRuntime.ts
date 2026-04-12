@@ -39,6 +39,10 @@ export type RuntimeSetupOptions = {
   wireframeColors?: Partial<WireframeColors>;
 };
 
+export type RuntimeRenderOptions = {
+  zoom?: number;
+};
+
 type EntityLike = Entity & {
   entities?: EntityLike[];
 };
@@ -204,10 +208,12 @@ export function renderRuntimeScene(
   ctx: CanvasRenderingContext2D,
   runtime: RuntimeScene,
   viewport: Dimensions,
-  showWireframes: boolean
+  showWireframes: boolean,
+  options?: RuntimeRenderOptions
 ) {
   const canvas = ctx.canvas;
   runtime.engineState.canvas = canvas;
+  const zoom = Math.max(0.1, options?.zoom ?? 1);
 
   runtime.engineState.config = {
     ...runtime.engineState.config,
@@ -221,7 +227,15 @@ export function renderRuntimeScene(
   ctx.fillStyle = "#f8fbff";
   ctx.fillRect(0, 0, viewport.width, viewport.height);
 
+  ctx.save();
+  if (zoom !== 1) {
+    ctx.translate(viewport.width / 2, viewport.height / 2);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-viewport.width / 2, -viewport.height / 2);
+  }
+
   runtime.engineState.activeScene?.entities.forEach((entity) => {
     entity.render(runtime.engineState)(entity);
   });
+  ctx.restore();
 }

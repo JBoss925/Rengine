@@ -1,6 +1,6 @@
 export const DEFAULT_WIREFRAME_COLORS: WireframeColors = {
   anchor: "#ff5b6f",
-  position: "#3f9dff",
+  position: "#f4d35e",
   relationship: "#141414"
 };
 
