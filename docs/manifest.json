@@ -5,12 +5,7 @@
     {
       "src": "rengine-logo.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "rengine-logo.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "82x82"
     }
   ],
   "start_url": ".",
