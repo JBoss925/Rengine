@@ -73,6 +73,11 @@ This overlay is currently implemented for the canvas renderer path.
 
 ## Running Locally
 
+Prerequisites:
+
+- Node.js 20 or newer
+- npm
+
 Install dependencies:
 
 ```bash
@@ -85,12 +90,60 @@ Start the dev server:
 npm start
 ```
 
+The `start` script is an alias for Vite. `npm run dev` is also available.
+
 Build the project:
 
 ```bash
 npm run build
 ```
 
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+Run tests:
+
+```bash
+npm test
+```
+
+## Runbook
+
+Use this sequence for a clean local verification pass:
+
+```bash
+npm install
+npm test
+npm run build
+npm run dev
+```
+
+Open the Vite URL and verify:
+
+1. The default scene renders.
+2. Demo scene selection changes the rendered hierarchy.
+3. Wireframe markers can be toggled.
+4. Canvas zoom controls work from 0.1x to 2x.
+5. The runtime tree shows local/world transform values.
+
+## Configuration Notes
+
+Important demo/runtime settings live in [`src/Lifecycle.tsx`](./src/Lifecycle.tsx):
+
+- `RENDERING_ENGINE`: `canvas` or `react`.
+- `LOOP_MODE`: interval or animation-frame scheduling.
+- `SHOW_TRANSFORMATION_POINTS`: debug transform marker visibility.
+- `FPS_LIMIT`: frame cap for interval-style loops.
+
 ## Why This Repo Exists
 
 Rengine is less about shipping a complete game and more about experimenting with engine boundaries. It is a compact playground for testing how scene graphs, hierarchical transforms, update components, and rendering strategies fit together in TypeScript.
+
+## Troubleshooting
+
+- If transforms look wrong, enable transformation points and compare anchor, position, and relationship markers.
+- If a demo scene does not change, confirm the active scene is recreated through `src/Lifecycle.tsx`.
+- If tests fail after dependency changes, reinstall with `npm install` and rerun `npm test`.
